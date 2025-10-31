@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MaxWink Fitness — Colorful Single File</title>
+
+  <!-- React / ReactDOM / Babel (for in-browser JSX) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- All CSS embedded here -->
+  <style>
+    :root{
+      --bg-1: #0f1724;       /* deep night */
+      --glass: rgba(255,255,255,0.06);
+      --accent-1: #ff6b6b;   /* coral */
+      --accent-2: #7c3aed;   /* purple */
+      --accent-3: #06b6d4;   /* teal */
+      --accent-4: #ffd24c;   /* sun */
+      --card: rgba(255,255,255,0.04);
+      --muted: rgba(255,255,255,0.7);
+      --radius: 16px;
+      --transition: 200ms ease;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body,#root{ height:100%; margin:0; background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.18), transparent 6%),
+                                           radial-gradient(1000px 500px at 95% 85%, rgba(6,182,212,0.12), transparent 6%),
+                                           linear-gradient(180deg,#0b1020 0%, #0f1724 100%); color:#fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+
+    /* Layout */
+    .app { max-width:1200px; margin:28px auto; padding:18px; display:flex; flex-direction:column; gap:20px; }
+    header.app-header { display:flex; align-items:center; justify-content:space-between; gap:12px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding:18px; border-radius:14px; box-shadow: 0 6px 24px rgba(0,0,0,0.45); backdrop-filter: blur(6px); }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .logo { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; background: linear-gradient(135deg,var(--accent-2),var(--accent-1)); box-shadow: 0 6px 20px rgba(124,58,237,0.12); }
+    .brand h1 { margin:0; font-size:20px; letter-spacing:0.2px; }
+    .brand p { margin:0; font-size:11px; color:var(--muted); }
+
+    nav.top-nav { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    nav.top-nav button { background:transparent; border:0; color:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; transition:all var(--transition); }
+    nav.top-nav button:hover { transform:translateY(-3px); }
+    nav.top-nav .badge { position:relative; }
+    nav.top-nav .badge .count { position:absolute; top:-8px; right:-8px; background:var(--accent-1); color:#111; width:20px; height:20px; display:flex; justify-content:center; align-items:center; border-radius:99px; font-size:12px; font-weight:700; box-shadow:0 4px 12px rgba(0,0,0,0.45); }
+
+    main { display:grid; gap:20px; grid-template-columns: 1fr; }
+    @media(min-width:980px){ main { grid-template-columns: 1fr; } }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, rgba(255,107,107,0.12), rgba(124,58,237,0.12)); border-radius:20px; padding:36px; display:flex; align-items:center; justify-content:space-between; gap:20px; box-shadow: 0 10px 40px rgba(12,14,20,0.6); }
+    .hero h2 { margin:0; font-size:36px; line-height:1.02; }
+    .hero p { margin:6px 0 0 0; color:var(--muted); }
+    .hero .cta { display:flex; gap:12px; margin-top:12px; }
+    .btn { border:0; padding:12px 20px; border-radius:999px; cursor:pointer; font-weight:800; letter-spacing:0.2px; transition: all var(--transition); }
+    .btn.primary { background: linear-gradient(90deg,var(--accent-4), #ffb86b); color:#111; box-shadow: 0 8px 28px rgba(255,184,107,0.12); }
+    .btn.ghost { background: rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.04); }
+    .btn.primary:hover { transform:translateY(-4px); }
+    .hero-emoji { font-size:72px; opacity:0.95; filter: drop-shadow(0 14px 40px rgba(0,0,0,0.6)); }
+
+    /* Cards grid */
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    @media(max-width:900px){ .cards { grid-template-columns:repeat(1,1fr); } }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:18px; min-height:120px; box-shadow: 0 8px 24px rgba(2,6,23,0.6); }
+    .card .title { display:flex; gap:10px; align-items:center; font-weight:800; font-size:18px; color:#fff; }
+    .card p { color:var(--muted); margin:10px 0 0 0; }
+
+    /* Progress box */
+    .progress { display:flex; gap:12px; margin-top:8px; }
+    .progress .stat { background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; flex:1; text-align:center; }
+    .stat .num { font-size:34px; font-weight:900; }
+    .stat .label { color:var(--muted); font-size:12px; margin-top:6px; }
+
+    /* Nutrition, Exercise, Shop panels */
+    .panel { background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:18px; border-radius:16px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+    .panel h2 { margin:0 0 12px 0; display:flex; align-items:center; gap:10px; font-size:20px; }
+    .form-row { display:flex; gap:12px; margin-bottom:14px; }
+    .form-row input[type="number"], .form-row select { background: transparent; border:1px solid rgba(255,255,255,0.06); padding:10px 12px; border-radius:10px; color:#fff; min-width:0; flex:1; }
+    .cal-target { background: linear-gradient(90deg, rgba(255,214,76,0.12), rgba(255,107,107,0.06)); border-radius:12px; padding:14px; text-align:center; font-weight:800; }
+
+    .food-grid { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+    @media(max-width:1000px){ .food-grid{ grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:600px){ .food-grid{ grid-template-columns: repeat(2,1fr); } }
+    .food-btn { background: rgba(255,255,255,0.02); border-radius:10px; padding:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.03); display:flex; flex-direction:column; align-items:center; gap:6px; transition: transform var(--transition), box-shadow var(--transition); }
+    .food-btn:hover { transform:translateY(-6px); box-shadow:0 12px 30px rgba(0,0,0,0.6); }
+    .food-btn .emoji { font-size:28px; }
+
+    .list { display:flex; flex-direction:column; gap:8px; }
+    .list-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.02); }
+
+    /* Exercise grid */
+    .exercise-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    @media(max-width:1100px){ .exercise-grid{ grid-template-columns:repeat(2,1fr); } }
+
+    /* Shop */
+    .product-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    @media(max-width:900px){ .product-grid{ grid-template-columns:repeat(2,1fr); } }
+    .product { padding:16px; border-radius:12px; text-align:center; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.02); }
+    .price { font-size:18px; font-weight:900; margin:8px 0; }
+
+    .cart { margin-top:12px; padding:12px; border-radius:12px; background: linear-gradient(90deg, rgba(255,214,76,0.06), rgba(6,182,212,0.03)); }
+    .cart .empty { color:var(--muted); text-align:center; padding:18px; }
+
+    footer.app-footer { margin-top:20px; padding:18px; border-radius:12px; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); text-align:center; color:var(--muted); font-size:14px; }
+
+    /* small helpers */
+    .flex { display:flex; gap:10px; align-items:center; }
+    .right { margin-left:auto; }
+    .muted { color:var(--muted); font-size:13px; }
+    .pill { padding:6px 10px; border-radius:999px; background: rgba(255,255,255,0.03); font-weight:700; }
+
+    button:focus { outline: none; box-shadow:0 0 0 3px rgba(124,58,237,0.14); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- App code (Babel will transform JSX) -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function MaxwinkFitness() {
+      const [currentPage, setCurrentPage] = useState('home');
+      const [weight, setWeight] = useState(70);
+      const [goalType, setGoalType] = useState('maintain');
+      const [dailyCalories, setDailyCalories] = useState(0);
+      const [cart, setCart] = useState([]);
+      const [meals, setMeals] = useState([]);
+      const [exercises, setExercises] = useState([]);
+
+      const products = [
+        { id: 1, name: 'Protein Shake', price: 5, category: 'supplements', image: '🥤', calories: 150 },
+        { id: 2, name: 'Meal Plan Guide', price: 5, category: 'guides', image: '📋', calories: 0 },
+        { id: 3, name: 'Workout Program', price: 5, category: 'programs', image: '💪', calories: 0 },
+        { id: 4, name: 'Vitamin Pack', price: 5, category: 'supplements', image: '💊', calories: 10 },
+        { id: 5, name: 'Fitness Tracker', price: 5, category: 'equipment', image: '⌚', calories: 0 },
+        { id: 6, name: 'Yoga Mat', price: 5, category: 'equipment', image: '🧘', calories: 0 }
+      ];
+
+      const foods = [
+        { name: 'Boiled Eggs', calories: 155, protein: 13, type: 'protein', icon: '🥚' },
+        { name: 'Chicken Breast', calories: 165, protein: 31, type: 'protein', icon: '🍗' },
+        { name: 'Brown Rice', calories: 216, protein: 5, type: 'carbs', icon: '🍚' },
+        { name: 'Broccoli', calories: 55, protein: 4, type: 'vegetable', icon: '🥦' },
+        { name: 'Carrots', calories: 41, protein: 1, type: 'vegetable', icon: '🥕' },
+        { name: 'Spinach', calories: 23, protein: 3, type: 'vegetable', icon: '🥬' },
+        { name: 'Banana', calories: 105, protein: 1, type: 'fruit', icon: '🍌' },
+        { name: 'Oatmeal', calories: 150, protein: 6, type: 'carbs', icon: '🥣' },
+        { name: 'Almonds', calories: 164, protein: 6, type: 'healthy-fat', icon: '🥜' },
+        { name: 'Salmon', calories: 206, protein: 22, type: 'protein', icon: '🐟' }
+      ];
+
+      const exerciseList = [
+        { name: 'Push-ups', calories: 112, duration: 30, icon: '💪', type: 'strength' },
+        { name: 'Cycling', calories: 260, duration: 30, icon: '🚴', type: 'cardio' },
+        { name: 'Swimming', calories: 300, duration: 30, icon: '🏊', type: 'cardio' },
+        { name: 'Running', calories: 280, duration: 30, icon: '🏃', type: 'cardio' },
+        { name: 'Yoga', calories: 120, duration: 30, icon: '🧘', type: 'flexibility' },
+        { name: 'Weight Lifting', calories: 180, duration: 30, icon: '🏋️', type: 'strength' },
+        { name: 'Jump Rope', calories: 340, duration: 30, icon: '🪢', type: 'cardio' },
+        { name: 'Plank', calories: 90, duration: 30, icon: '⏱️', type: 'core' }
+      ];
+
+      const addToCart = (product) => setCart(prev => [...prev, product]);
+      const removeFromCart = (index) => setCart(prev => prev.filter((_, i) => i !== index));
+      const addMeal = (food) => setMeals(prev => [...prev, { ...food, time: new Date().toLocaleTimeString() }]);
+      const addExercise = (exercise) => setExercises(prev => [...prev, { ...exercise, time: new Date().toLocaleTimeString() }]);
+
+      const totalCartPrice = cart.reduce((sum, item) => sum + item.price, 0);
+      const totalCaloriesConsumed = meals.reduce((sum, meal) => sum + meal.calories, 0);
+      const totalCaloriesBurned = exercises.reduce((sum, ex) => sum + ex.calories, 0);
+      const netCalories = totalCaloriesConsumed - totalCaloriesBurned;
+
+      useEffect(() => {
+        let baseCalories = weight * 22;
+        if (goalType === 'gain') baseCalories += 500;
+        if (goalType === 'loss') baseCalories -= 500;
+        setDailyCalories(baseCalories);
+      }, [weight, goalType]);
+
+      const checkout = () => {
+        if (totalCartPrice <= 0) {
+          alert('Your cart is empty!');
+          return;
+        }
+        alert(`Processing payment: $${totalCartPrice}\nPayment method: Credit Card\nOrder confirmed! Thank you for shopping with MaxWink!`);
+        setCart([]);
+      };
+
+      return (
+        <div className="app">
+          <header className="app-header">
+            <div className="brand">
+              <div className="logo">💪</div>
+              <div>
+                <h1>MaxWink Fitness</h1>
+                <p>Powered by MaxWink</p>
+              </div>
+            </div>
+
+            <nav className="top-nav">
+              <button onClick={() => setCurrentPage('home')}>Home</button>
+              <button onClick={() => setCurrentPage('nutrition')}>Nutrition</button>
+              <button onClick={() => setCurrentPage('exercise')}>Exercise</button>
+              <button onClick={() => setCurrentPage('heart')}>Heart</button>
+              <button onClick={() => setCurrentPage('brain')}>Brain</button>
+              <button className="badge" onClick={() => setCurrentPage('shop')}>
+                Shop
+                {cart.length > 0 && <span className="count">{cart.length}</span>}
+              </button>
+            </nav>
+          </header>
+
+          <main>
+            {currentPage === 'home' && (
+              <>
+                <section className="hero">
+                  <div>
+                    <h2>Transform Your Body & Mind</h2>
+                    <p>Track calories, exercise, and achieve your fitness goals with a colorful, easy-to-use dashboard.</p>
+                    <div className="cta">
+                      <button className="btn primary" onClick={() => setCurrentPage('nutrition')}>Start Tracking</button>
+                      <button className="btn ghost" onClick={() => setCurrentPage('shop')}>Shop Now</button>
+                    </div>
+                  </div>
+                  <div className="hero-emoji">🏋️‍♀️</div>
+                </section>
+
+                <section className="cards" aria-hidden>
+                  <div className="card">
+                    <div className="title">⬇️ Weight Loss</div>
+                    <p>Burn fat with tailored meal plans and cardio workouts.</p>
+                    <div style={{marginTop:12}}>
+                      <button className="btn primary" onClick={() => { setGoalType('loss'); setCurrentPage('nutrition'); }}>Start Plan</button>
+                    </div>
+                  </div>
+
+                  <div className="card">
+                    <div className="title">⚡ Maintain</div>
+                    <p>Balanced nutrition and movement to keep you energized.</p>
+                    <div style={{marginTop:12}}>
+                      <button className="btn" onClick={() => { setGoalType('maintain'); setCurrentPage('nutrition'); }}>Start Plan</button>
+                    </div>
+                  </div>
+
+                  <div className="card">
+                    <div className="title">⬆️ Weight Gain</div>
+                    <p>High-calorie, nutrient-dense plans for building muscle.</p>
+                    <div style={{marginTop:12}}>
+                      <button className="btn primary" onClick={() => { setGoalType('gain'); setCurrentPage('nutrition'); }}>Start Plan</button>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="card">
+                  <h3 style={{margin:0}}>Today's Progress</h3>
+                  <div className="progress">
+                    <div className="stat">
+                      <div className="num">{totalCaloriesConsumed}</div>
+                      <div className="label">Calories Eaten</div>
+                    </div>
+                    <div className="stat">
+                      <div className="num" style={{color:'#ff6b6b'}}>{totalCaloriesBurned}</div>
+                      <div className="label">Calories Burned</div>
+                    </div>
+                    <div className="stat">
+                      <div className="num" style={{color:'#ffd24c'}}>{netCalories}</div>
+                      <div className="label">Net Calories</div>
+                    </div>
+                  </div>
+                </section>
+              </>
+            )}
+
+            {currentPage === 'nutrition' && (
+              <section className="panel">
+                <h2><span>🍎</span> Nutrition Tracker</h2>
+
+                <div className="form-row">
+                  <div style={{flex:1}}>
+                    <label className="muted">Your Weight (kg)</label>
+                    <input type="number" value={weight} onChange={(e)=>setWeight(Number(e.target.value))}/>
+                  </div>
+                  <div style={{flex:1}}>
+                    <label className="muted">Goal</label>
+                    <select value={goalType} onChange={(e)=>setGoalType(e.target.value)}>
+                      <option value="loss">Weight Loss</option>
+                      <option value="maintain">Maintain Weight</option>
+                      <option value="gain">Weight Gain</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="cal-target"><strong>{dailyCalories} cal</strong><div style={{fontSize:12,color:'rgba(255,255,255,0.8)'}}>Daily Calorie Target</div></div>
+
+                <h3 style={{marginTop:16}}>Add Food</h3>
+                <div className="food-grid" style={{marginTop:10}}>
+                  {foods.map((food,idx)=>(
+                    <button key={idx} className="food-btn" onClick={()=>addMeal(food)}>
+                      <div className="emoji">{food.icon}</div>
+                      <div style={{fontWeight:800,fontSize:13}}>{food.name}</div>
+                      <div className="muted" style={{fontSize:12}}>{food.calories} cal</div>
+                    </button>
+                  ))}
+                </div>
+
+                <h3 style={{marginTop:16}}>Today's Meals</h3>
+                <div className="list">
+                  {meals.length===0 ? <div className="list-item empty muted">No meals logged yet</div> :
+                    meals.map((meal,idx)=>(
+                      <div key={idx} className="list-item">
+                        <div className="flex">
+                          <div style={{fontSize:26}}>{meal.icon}</div>
+                          <div style={{marginLeft:10}}>
+                            <div style={{fontWeight:800}}>{meal.name}</div>
+                            <div className="muted" style={{fontSize:12}}>{meal.time}</div>
+                          </div>
+                        </div>
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontWeight:800}}>{meal.calories}</div>
+                          <div className="muted" style={{fontSize:12}}>calories</div>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </section>
+            )}
+
+            {currentPage === 'exercise' && (
+              <section className="panel">
+                <h2><span>🏋️</span> Exercise Tracker</h2>
+
+                <div className="exercise-grid" style={{marginTop:10}}>
+                  {exerciseList.map((ex,idx)=>(
+                    <button key={idx} className="food-btn" onClick={()=>addExercise(ex)} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+                      <div style={{fontSize:34}}>{ex.icon}</div>
+                      <div style={{fontWeight:800,marginTop:8}}>{ex.name}</div>
+                      <div className="muted" style={{fontSize:12,marginTop:6}}>{ex.calories} cal/30min</div>
+                      <div className="muted" style={{fontSize:12,marginTop:6}}>⏱ {ex.duration} min</div>
+                    </button>
+                  ))}
+                </div>
+
+                <h3 style={{marginTop:16}}>Today's Workout</h3>
+                <div className="list">
+                  {exercises.length===0 ? <div className="list-item empty muted">No exercises logged yet</div> :
+                    exercises.map((ex,idx)=>(
+                      <div key={idx} className="list-item">
+                        <div className="flex">
+                          <div style={{fontSize:26}}>{ex.icon}</div>
+                          <div style={{marginLeft:10}}>
+                            <div style={{fontWeight:800}}>{ex.name}</div>
+                            <div className="muted" style={{fontSize:12}}>{ex.time}</div>
+                          </div>
+                        </div>
+                        <div style={{textAlign:'right', color:'#ff6b6b', fontWeight:800}}>
+                          <div>{ex.calories}</div>
+                          <div className="muted" style={{fontSize:12}}>calories burned</div>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </section>
+            )}
+
+            {currentPage === 'heart' && (
+              <section className="panel">
+                <h2>❤️ Heart Health</h2>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+                  <div className="card">
+                    <h4 style={{margin:0}}>Heart-Healthy Foods</h4>
+                    <ul style={{marginTop:10,color:'var(--muted)'}}>
+                      <li>🐟 Salmon — Rich in Omega-3</li>
+                      <li>🥜 Nuts — Lower cholesterol</li>
+                      <li>🫐 Berries — Antioxidants</li>
+                      <li>🥑 Avocado — Healthy fats</li>
+                      <li>🍅 Tomatoes — Lycopene</li>
+                    </ul>
+                  </div>
+                  <div className="card">
+                    <h4 style={{margin:0}}>Cardio Exercises</h4>
+                    <ul style={{marginTop:10,color:'var(--muted)'}}>
+                      <li>🏃 Running — 30 min daily</li>
+                      <li>🚴 Cycling — Low impact</li>
+                      <li>🏊 Swimming — Full body</li>
+                      <li>🚶 Walking — 10k steps</li>
+                      <li>🪢 Jump Rope — HIIT</li>
+                    </ul>
+                  </div>
+                </div>
+                <div style={{marginTop:12, padding:12, borderRadius:10, background:'rgba(255,214,76,0.06)'}}>
+                  <strong>Tips:</strong>
+                  <div className="muted" style={{marginTop:6}}>Exercise 150 minutes/week • Reduce sodium • Manage stress • Sleep 7–9 hours</div>
+                </div>
+              </section>
+            )}
+
+            {currentPage === 'brain' && (
+              <section className="panel">
+                <h2>🧠 Brain Health & Exercises</h2>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+                  <div className="card">
+                    <h4 style={{margin:0}}>Brain-Boosting Foods</h4>
+                    <ul style={{marginTop:10,color:'var(--muted)'}}>
+                      <li>🥚 Eggs — Choline for memory</li>
+                      <li>🥦 Broccoli — Vitamin K</li>
+                      <li>🫐 Blueberries — Improve cognition</li>
+                      <li>🥜 Walnuts — Omega-3</li>
+                      <li>🍫 Dark Chocolate — Focus</li>
+                    </ul>
+                  </div>
+                  <div className="card">
+                    <h4 style={{margin:0}}>Mental Exercises</h4>
+                    <ul style={{marginTop:10,color:'var(--muted)'}}>
+                      <li>🧩 Puzzles — Problem solving</li>
+                      <li>📚 Reading — Memory boost</li>
+                      <li>🧘 Meditation — Focus training</li>
+                      <li>🎵 Music — Neural connections</li>
+                      <li>🗣️ Learn Languages — Cognitive</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {currentPage === 'shop' && (
+              <section className="panel">
+                <h2>🛒 MaxWink Shop</h2>
+
+                <div className="product-grid" style={{marginTop:12}}>
+                  {products.map(p=>(
+                    <div key={p.id} className="product">
+                      <div style={{fontSize:48}}>{p.image}</div>
+                      <div style={{fontWeight:900, marginTop:8}}>{p.name}</div>
+                      <div className="price">${p.price}</div>
+                      <button className="btn primary" onClick={()=>addToCart(p)}>Add to Cart</button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="cart">
+                  <h3 style={{margin:0}}>Your Cart ({cart.length})</h3>
+                  {cart.length===0 ? (
+                    <div className="empty">Your cart is empty</div>
+                  ) : (
+                    <>
+                      <div style={{marginTop:10, display:'flex', flexDirection:'column', gap:8}}>
+                        {cart.map((item,idx)=>(
+                          <div key={idx} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px',borderRadius:8,background:'rgba(255,255,255,0.02)'}}>
+                            <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                              <div style={{fontSize:26}}>{item.image}</div>
+                              <div style={{fontWeight:800}}>{item.name}</div>
+                            </div>
+                            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                              <div style={{fontWeight:900}}>${item.price}</div>
+                              <button onClick={()=>removeFromCart(idx)} style={{background:'#ff6b6b',border:0,color:'#111',padding:'8px 10px',borderRadius:8,cursor:'pointer'}}>Remove</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{marginTop:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <div style={{fontWeight:900,fontSize:18}}>Total: ${totalCartPrice}</div>
+                        <button className="btn primary" onClick={checkout}>Checkout - Pay ${totalCartPrice}</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </section>
+            )}
+          </main>
+
+          <footer className="app-footer">
+            <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:12}}>
+              <div style={{fontSize:26}}>💪</div>
+              <div>
+                <div style={{fontWeight:800}}>MaxWink Fitness</div>
+                <div className="muted">Your Complete Health & Fitness Platform — © MaxWink 2024</div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MaxwinkFitness />);
+  </script>
+</body>
+</html>
